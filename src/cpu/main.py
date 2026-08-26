@@ -12,5 +12,9 @@ def entry():
     args = parser.parse_args()
     cpu = CPU(args.memsize, args.romsize)
 
-    while not cpu.HALT:
-        cpu.cycle()
+    while True:
+        check_io(cpu)
+        cpu.tick()
+
+def check_io(cpu: CPU):
+    pass # check keyboard and display to screen here

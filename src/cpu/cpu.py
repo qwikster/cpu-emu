@@ -1,8 +1,16 @@
-from types import SimpleNamespace
+from enum import Enum
 
 from cpu.alu import ALU
 from cpu.cu import CU
+from cpu.mu import MU
+from cpu.register import Register
 
+
+class CPUState(Enum):
+    FETCH =     "fetch"
+    DECODE =    "dec"
+    EXECUTE =   "exec"
+    WRITEBACK = "wb"
 
 class CPU:
     def __init__(
@@ -10,39 +18,19 @@ class CPU:
         memsize: int = 512,
         romsize: int = 2048,
         binary: list[int] | None = None,
-        flag_debug: bool = False
-
+        flag_debug: bool = False,
     ):
-        if binary is None:
-            binary = []
+        self.state = CPUState(CPUState.FETCH)
+        self.processor_cycle = 0   # global count
+        self.instruction_cycle = 0 # per instruction EXECUTE (long ones)
 
-        self.rom_start = memsize
-        self.memory = [0x00] * (memsize + romsize)
+        self.interrupt = 0 # hardware interrupt line
 
-        for i, byte in enumerate(binary):
-            if i < romsize:
-                self.memory[self.rom_start + i] = byte
+        self.alu = ALU()
+        self.mu = MU(memsize, romsize, binary)
+        self.register = Register(stack = memsize, debug = flag_debug)
+ # Arithmetic
+        self.cu = CU(self.register, self.mu)   # Control (opcodes)
 
-        registers_dict = {
-            "PC": 0x0000, # next instruction,
-            "IR": 0x00, # current opcode
-            "flags": {
-                "ZF": False, # Zero flag
-                "CF": False, # Carry
-                "SF": False, # Sign
-                "OF": False, # Overflow
-                "TF": flag_debug, # Trap / Debug
-            },
-            "registers": [0x00] * 12
-        }
-
-        self.registers = SimpleNamespace(**registers_dict)
-
-        self.interrupt = 0x0000
-        self.HALT = False
-
-        self.CU = CU()   # Control (opcodes)
-        self.ALU = ALU() # Arithmetic
-
-    def cycle(self):
+    def tick(self):
         pass
