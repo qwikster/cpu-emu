@@ -26,10 +26,9 @@ class CPU:
 
         self.interrupt = 0 # hardware interrupt line
 
-        self.alu = ALU()
-        self.mu = MU(memsize, romsize, binary)
+        self.alu = ALU()  # Arithmetic
+        self.mu = MU(memsize, romsize, binary) # Memory
         self.register = Register(stack = memsize, debug = flag_debug)
- # Arithmetic
         self.cu = CU(self.register, self.mu)   # Control (opcodes)
 
     def tick(self):
