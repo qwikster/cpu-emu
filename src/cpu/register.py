@@ -15,7 +15,7 @@ class Register:
                 "IF": False, # enable interrupts
                 "TF": debug, # Trap / Debug
             },
-            "registers": [0x00] * 12
+            "registers": [0x0000] * 12
         }
 
         self.registers = SimpleNamespace(**registers_dict)

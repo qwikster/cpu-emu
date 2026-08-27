@@ -1,7 +1,13 @@
 import argparse
+from types import SimpleNamespace
 
 from cpu.cpu import CPU
+from cpu.debug import Debug
 
+debug_settings_dict = {
+    "setup": True,
+    "memory": True,
+}
 
 def entry():
     parser = argparse.ArgumentParser(description="shitass cpu emulator")
@@ -10,7 +16,21 @@ def entry():
     parser.add_argument("--romsize", "--rom", "-r", type=int, default = 4096, help = "size of ROM in bytes")
 
     args = parser.parse_args()
-    cpu = CPU(args.memsize, args.romsize)
+
+    if not args.binary:
+        binary = bytes(0)
+    else:
+        with open(args.binary, 'rb') as f:
+            binary = f.read()
+
+    debug = Debug(SimpleNamespace(**debug_settings_dict))
+
+    cpu = CPU(
+        binary = binary,
+        memsize = args.memsize,
+        romsize = args.romsize,
+        debug_settings = debug_settings
+    )
 
     while True:
         check_io(cpu)
