@@ -1,10 +1,12 @@
 from enum import Enum
-from types import SimpleNamespace
 
 from cpu.alu import ALU
 from cpu.cu import CU
-from cpu.mu import MU
+from cpu.logging import Logger
+from cpu.mu import MU, StdoutOutput
 from cpu.register import Register
+
+import random
 
 
 class CPUState(Enum):
@@ -16,15 +18,13 @@ class CPUState(Enum):
 class CPU:
     def __init__(
         self,
-        debug_settings: SimpleNamespace,
         binary: bytes,
+        logger: Logger,
         memsize: int = 512,
         romsize: int = 2048,
         flag_debug: bool = False,
     ):
-        self.debug = debug_settings
-
-
+        self.log = logger
 
         self.state = CPUState.FETCH
         self.processor_cycle = 0   # global count
@@ -33,9 +33,11 @@ class CPU:
         self.interrupt = 0 # hardware interrupt line
 
         self.alu = ALU()  # Arithmetic
-        self.mu = MU(self.debug) # Memory
+        self.mu = MU(self.log) # Memory
         self.register = Register(stack = memsize, debug = flag_debug)
         self.cu = CU(self.register, self.mu)   # Control (opcodes)
 
+        self.mu.map_device(0xF000, 0xF000, StdoutOutput())
+
     def tick(self):
-        pass
+        self.mu.write(0xF000, random.randint(0, 255))

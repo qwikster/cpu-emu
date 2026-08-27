@@ -1,6 +1,11 @@
 import bisect
-from types import SimpleNamespace
 
+from cpu.logging import Logger
+
+_hex = hex
+def hex(int) -> str:
+    goob = _hex(int).upper()
+    return goob[0] + "x" + goob[2:]
 
 class EmulatorMemoryError(MemoryError):
     pass
@@ -51,15 +56,14 @@ class ResetBytes(MemoryDevice):
                 raise EmulatorMemoryError("outside of reset bytes")
 
 class MU:
-    def __init__(self, debug: SimpleNamespace):
-        self.debug = debug
+    def __init__(self, logger: Logger):
+        self.log = logger
 
         self.devices = []
         self.starts = []
         self.ends = []
 
-        if self.debug.setup:
-            print("SETUP: made the memory unit")
+        self.log.setup("created memory unit")
 
     def map_device(self, start: int, end: int, device: MemoryDevice):
         idx = bisect.bisect_right(self.starts, start)
@@ -67,8 +71,7 @@ class MU:
         self.starts.insert(idx, start)
         self.ends.insert(idx, end)
 
-        if self.debug.setup:
-            print(f"SETUP: mapped device {type(device)} to {hex(start)}-{hex(end)}")
+        self.log.setup(f"mapped device {type(device).__name__} to {hex(start)}-{hex(end)}")
 
     def get_device(self, addr: int):
         idx = bisect.bisect_right(self.starts, addr) - 1
@@ -81,8 +84,7 @@ class MU:
         device, base_addr = self.get_device(addr)
         try:
             value = device.read(addr - base_addr)
-            if self.debug.memory:
-                print(f"MEM: read {hex(value)} from {hex(addr)}")
+            self.log.memory(f"read {hex(value)} from {hex(addr)}")
             return value
         except Exception as e:
             raise EmulatorMemoryError(f"error reading {hex(addr)}: {e}")
@@ -91,8 +93,7 @@ class MU:
     def write(self, addr: int, value: int):
         device, base_addr = self.get_device(addr)
         try:
-            if self.debug.memory:
-                print(f"MEM: writing {hex(value)} to {hex(addr)}")
+            self.log.memory(f"writing {hex(value)} to {hex(addr)}")
             return device.write(addr - base_addr, value)
         except Exception as e:
             raise EmulatorMemoryError(f"error writing to {hex(addr)}: {e}")

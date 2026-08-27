@@ -1,13 +1,9 @@
 import argparse
-from types import SimpleNamespace
+from time import sleep
 
 from cpu.cpu import CPU
-from cpu.debug import Debug
+from cpu.logging import Logger
 
-debug_settings_dict = {
-    "setup": True,
-    "memory": True,
-}
 
 def entry():
     parser = argparse.ArgumentParser(description="shitass cpu emulator")
@@ -23,18 +19,22 @@ def entry():
         with open(args.binary, 'rb') as f:
             binary = f.read()
 
-    debug = Debug(SimpleNamespace(**debug_settings_dict))
+    logger = Logger(default = True, setup = True)
+    logger.setup("logger started")
 
     cpu = CPU(
         binary = binary,
+        logger = logger,
         memsize = args.memsize,
         romsize = args.romsize,
-        debug_settings = debug_settings
     )
+
+    logger.setup("starting CPU")
 
     while True:
         check_io(cpu)
         cpu.tick()
+        sleep(0.1)
 
 def check_io(cpu: CPU):
     pass # check keyboard and display to screen here
