@@ -2,12 +2,12 @@ from enum import Enum
 
 from cpu.alu import ALU
 from cpu.cu import CU
+from cpu.exceptions import EmulatorMemoryError
 from cpu.logging import Logger
-from cpu.mu import MU, StdoutOutput
-from cpu.register import Register
+from cpu.mu import MU, RAM, ROM, StdoutOutput
+from cpu.register import Registers
 
-import random
-
+MAX_MEMORY = 61440
 
 class CPUState(Enum):
     FETCH =     "fetch"
@@ -20,24 +20,34 @@ class CPU:
         self,
         binary: bytes,
         logger: Logger,
-        memsize: int = 512,
-        romsize: int = 2048,
+        memsize: int = 4096,  # 4K
+        romsize: int = 57344, # 56K
         flag_debug: bool = False,
     ):
         self.log = logger
 
-        self.state = CPUState.FETCH
-        self.processor_cycle = 0   # global count
-        self.instruction_cycle = 0 # per instruction EXECUTE (long ones)
+        self.state = CPUState.FETCH # part of instruction
+        self.processor_cycle = 0    # global count
+        self.instruction_cycle = 0  # per instruction EXECUTE (long ones)
 
         self.interrupt = 0 # hardware interrupt line
 
-        self.alu = ALU()  # Arithmetic
-        self.mu = MU(self.log) # Memory
-        self.register = Register(stack = memsize, debug = flag_debug)
-        self.cu = CU(self.register, self.mu)   # Control (opcodes)
+        # Memory
+        self.mu = MU(self.log)
+        if memsize + romsize > MAX_MEMORY:
+            raise EmulatorMemoryError(f"Assigning more RAM/ROM than is available (max: {hex(MAX_MEMORY)}, used: {hex(memsize + romsize)}")
 
+        self.mu.map_device(0x0000, romsize - 1, ROM(size = romsize, binary = binary))
+        self.mu.map_device(romsize, romsize + memsize - 1, RAM(size = memsize))
         self.mu.map_device(0xF000, 0xF000, StdoutOutput())
 
+        # Registers
+        self.reg = Registers(self.log, stack_addr = romsize + memsize - 1, debug = flag_debug)
+
+        # Instructions
+        self.alu = ALU()
+        self.cu = CU(self.reg, self.mu)
+
     def tick(self):
-        self.mu.write(0xF000, random.randint(0, 255))
+        self.cu.tick()
+        self.processor_cycle += 1

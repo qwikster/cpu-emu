@@ -1,14 +1,12 @@
 import bisect
 
+from cpu.exceptions import EmulatorMemoryError
 from cpu.logging import Logger
 
 _hex = hex
 def hex(int) -> str:
     goob = _hex(int).upper()
     return goob[0] + "x" + goob[2:]
-
-class EmulatorMemoryError(MemoryError):
-    pass
 
 class MemoryDevice:
     def read(self, addr: int) -> int:

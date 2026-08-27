@@ -1,0 +1,2 @@
+class EmulatorMemoryError(MemoryError):
+    pass
