@@ -3,6 +3,8 @@ import bisect
 from cpu.exceptions import EmulatorMemoryError
 from cpu.logging import Logger
 
+log: Logger
+
 _hex = hex
 def hex(int) -> str:
     goob = _hex(int).upper()
@@ -10,6 +12,8 @@ def hex(int) -> str:
 
 class MemoryDevice:
     def read(self, addr: int) -> int:
+        global log
+        log.setup("meow looped")
         raise NotImplementedError("this memory device does not have anything to read!")
     def write(self, addr: int, value: int):
         raise NotImplementedError("this memory device does not have anything to write!")
@@ -38,7 +42,8 @@ class RAM(MemoryDevice):
 
 class StdoutOutput(MemoryDevice):
     def write(self, addr: int, value: int):
-        print(chr(value), end = "", flush = True)
+        log.stdout(chr(value))
+        # print(chr(value), end = "", flush = True)
 
 class ResetBytes(MemoryDevice):
     def __init__(self, program_start_address: int = 0x0000):
@@ -56,6 +61,8 @@ class ResetBytes(MemoryDevice):
 class MU:
     def __init__(self, logger: Logger):
         self.log = logger
+        global log
+        log = self.log
 
         self.devices = []
         self.starts = []

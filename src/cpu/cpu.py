@@ -51,3 +51,8 @@ class CPU:
     def tick(self):
         self.cu.tick()
         self.processor_cycle += 1
+        if self.reg[0] >= 0x7:
+            self.log.interrupt("HALT")
+            input()
+        self.mu.write(0xF000, self.mu.read(self.reg[0]))
+        self.reg[0] += 1

@@ -38,10 +38,11 @@ class Registers:
         self.log.setup(f"GPR 1 thru 12: {self.GPR}")
         self.log.setup(f"{self.flags}")
 
-
     # cpu.registers[3] = 0x1234
     def __getitem__(self, idx: int) -> int:
+        self.log.register(f"Read {self.GPR[idx]} from R{idx + 1}")
         return self.GPR[idx]
 
     def __setitem__(self, idx: int, value: int):
         self.GPR[idx] = value & 0xFFFF
+        self.log.register(f"Wrote {value} to R{idx + 1}")

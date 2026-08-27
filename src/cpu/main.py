@@ -1,5 +1,4 @@
 import argparse
-from time import sleep
 
 from cpu.cpu import CPU
 from cpu.logging import Logger
@@ -19,7 +18,7 @@ def entry():
         with open(args.binary, 'rb') as f:
             binary = f.read()
 
-    logger = Logger(default = True, setup = True)
+    logger = Logger(default = True, stdout = True, setup = True)
     logger.setup("logger started")
 
     cpu = CPU(
@@ -35,7 +34,6 @@ def entry():
     while True:
         check_io(cpu)
         cpu.tick()
-        sleep(0.1)
 
 def check_io(cpu: CPU):
     pass # check keyboard and display to screen here

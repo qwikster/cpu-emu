@@ -6,10 +6,12 @@ LogMethod = Callable[[str], None]
 class Logger:
     setup: LogMethod
     memory: LogMethod
+    register: LogMethod
     clock: LogMethod
     cu: LogMethod
     alu: LogMethod
     interrupt: LogMethod
+    stdout: LogMethod
 
     start_time = time.perf_counter()
 
