@@ -1,18 +1,13 @@
 import bisect
 
-from proq.exceptions import EmulatorMemoryError
-from proq.logging import Logger
+from proq.util.exceptions import EmulatorMemoryError
+from proq.util.logging import Logger
+from proq.util.util import hex
 
 log: Logger
 
-_hex = hex
-def hex(int) -> str:
-    goob = _hex(int).upper()
-    return goob[0] + "x" + goob[2:]
-
 class MemoryDevice:
     def read(self, addr: int) -> int:
-        global log
         log.setup("meow looped")
         raise NotImplementedError("this memory device does not have anything to read!")
     def write(self, addr: int, value: int):

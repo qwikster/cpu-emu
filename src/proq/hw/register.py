@@ -1,13 +1,8 @@
 from dataclasses import dataclass, field
 
-from proq.logging import Logger
+from proq.util.logging import Logger
+from proq.util.util import hex
 
-_hex = hex
-def hex(int) -> str:
-    goob = _hex(int).upper()
-    if goob == "0X0":
-        return "0x0000"
-    return goob[0] + "x" + goob[2:]
 
 @dataclass
 class Flags:
@@ -40,9 +35,9 @@ class Registers:
 
     # cpu.registers[3] = 0x1234
     def __getitem__(self, idx: int) -> int:
-        self.log.register(f"Read {self.GPR[idx]} from R{idx + 1}")
+        self.log.register(f"Read {hex(self.GPR[idx])} from R{idx + 1}")
         return self.GPR[idx]
 
     def __setitem__(self, idx: int, value: int):
         self.GPR[idx] = value & 0xFFFF
-        self.log.register(f"Wrote {value} to R{idx + 1}")
+        self.log.register(f"Wrote {hex(value)} to R{idx + 1}")

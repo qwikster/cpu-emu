@@ -1,11 +1,11 @@
 from enum import Enum
 
-from proq.alu import ALU
-from proq.cu import CU
-from proq.exceptions import EmulatorMemoryError
-from proq.logging import Logger
-from proq.mu import MU, RAM, ROM, StdoutOutput
-from proq.register import Registers
+from proq.hw.alu import ALU
+from proq.hw.cu import CU
+from proq.hw.mu import MU, RAM, ROM, StdoutOutput
+from proq.hw.register import Registers
+from proq.util.exceptions import EmulatorMemoryError
+from proq.util.logging import Logger
 
 MAX_MEMORY = 61440
 

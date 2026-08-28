@@ -1,5 +1,5 @@
-from proq.mu import MU
-from proq.register import Registers
+from proq.hw.mu import MU
+from proq.hw.register import Registers
 
 
 class Instruction:
