@@ -1,4 +1,4 @@
-from cpu.isa.instructionclass import Instruction
+from proq.isa.instructionclass import Instruction
 
 
 class HALT(Instruction):

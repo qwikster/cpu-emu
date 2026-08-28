@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from cpu.logging import Logger
+from proq.logging import Logger
 
 _hex = hex
 def hex(int) -> str:

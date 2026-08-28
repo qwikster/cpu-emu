@@ -1,5 +1,5 @@
-from cpu.mu import MU
-from cpu.register import Registers
+from proq.mu import MU
+from proq.register import Registers
 
 
 class Instruction:

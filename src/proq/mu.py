@@ -1,7 +1,7 @@
 import bisect
 
-from cpu.exceptions import EmulatorMemoryError
-from cpu.logging import Logger
+from proq.exceptions import EmulatorMemoryError
+from proq.logging import Logger
 
 log: Logger
 

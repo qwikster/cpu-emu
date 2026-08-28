@@ -1,7 +1,7 @@
 import argparse
 
-from cpu.cpu import CPU
-from cpu.logging import Logger
+from proq.cpu import CPU
+from proq.logging import Logger
 
 
 def entry():
