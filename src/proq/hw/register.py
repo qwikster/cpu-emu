@@ -11,7 +11,7 @@ class Flags:
     SF: bool = False # Sign
     OF: bool = False # Overflow
     IF: bool = False # enable interrupts
-    TF: bool = False # Trap / Debug
+    TF: bool = False # Trap: step one at a time
 
 @dataclass
 class Registers:
