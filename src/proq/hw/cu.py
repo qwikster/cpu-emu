@@ -6,7 +6,7 @@ from proq.isa.base import Instruction
 from proq.isa.set import Op
 from proq.util.exceptions import InstructionNotImplementedError
 from proq.util.logging import Logger
-from proq.util.util import hex
+from proq.util.util import MutableInt, hex
 
 
 class CU:
@@ -24,10 +24,30 @@ class CU:
 
         self.logger = logger
 
-    def tick(self):
-        pass
-        # instruction = Instruction.registry[self.mu.read(self.registers.PC)]
-        # instance = instruction(self, self.mu, self.alu, self.registers)
-        # self.instruction_cycle = instance.execute()
-        # [ ... (on tick) ]
-        # next(self.instruction_cycle)
+        self.iterable = None
+
+    def tick(self, interrupt: MutableInt):
+        if not self.iterable:
+            if interrupt.value != 0:
+                self.logger.interrupt(f"loading interrupt {hex(int(interrupt), 2)}")
+                input()
+                return
+
+            opcode = self.mu.read(self.registers.PC)
+            self.registers.IR = opcode
+            instruction = Instruction.registry.get(opcode)
+            print('goog')
+            if not instruction:
+                self.logger.cu(f"Invalid instruction {hex(opcode, 2)}")
+                interrupt.set(0x01) # invalid opcode
+                return
+
+            instance = instruction(self.mu, self.alu, self.registers)
+            self.logger.cu(f"Running instruction {hex(opcode, 2)} ({instruction})")
+
+            self.iterable = instance.execute()
+
+        try:
+            next(self.iterable)
+        except StopIteration:
+            self.iterable = None

@@ -6,14 +6,9 @@ from proq.hw.mu import MU, RAM, ROM, StdoutOutput
 from proq.hw.register import Registers
 from proq.util.exceptions import EmulatorMemoryError
 from proq.util.logging import Logger
+from proq.util.util import MutableInt
 
 MAX_MEMORY = 61440
-
-class CPUState(Enum):
-    FETCH =     "fetch"
-    DECODE =    "dec"
-    EXECUTE =   "exec"
-    WRITEBACK = "wb"
 
 class CPU:
     def __init__(
@@ -26,11 +21,8 @@ class CPU:
     ):
         self.log = logger
 
-        self.state = CPUState.FETCH # part of instruction
-        self.processor_cycle = 0    # global count
-        self.instruction_cycle = 0  # per instruction EXECUTE (long ones)
-
-        self.interrupt = 0 # hardware interrupt line
+        self.interrupt = MutableInt(0x00) # hardware interrupt line
+        self.cycle = 0
 
         # Memory
         self.mu = MU(self.log)
@@ -49,11 +41,5 @@ class CPU:
         self.cu = CU(self.alu, self.mu, self.registers, logger = logger)
 
     def tick(self):
-        pass
-        # self.cu.tick()
-        # self.processor_cycle += 1
-        # if self.registers[0] >= 0x0E:
-        #     self.log.interrupt("HALT")
-        #     input()
-        # self.mu.write(0xF000, self.mu.read(self.registers[0]))
-        # self.registers[0] += 1
+        self.cycle += 1
+        self.cu.tick(self.interrupt)

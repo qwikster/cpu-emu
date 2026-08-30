@@ -24,9 +24,8 @@ class Instruction:
         except KeyError:
             Instruction.skipped.append(cls.__name__)
 
-    def __init__(self, cu: CU, mu: MU, alu: ALU, registers: Registers):
+    def __init__(self, mu: MU, alu: ALU, registers: Registers):
         self.alu = alu
-        self.cu = cu
         self.mu = mu
         self.registers = registers
 
