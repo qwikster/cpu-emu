@@ -40,3 +40,54 @@ Okay so I haven't mentioned a lot of stuff that I've worked on or that need to b
 
 ### Goog... :goog:
 hopefully this is uh, somewhat educational and doesn't just read as a rant!! the devlogs that Don't take 6 hours are to be a lot more digestible but until then time to go back to OOP hell :droidtehe: also this is like full character limit lmao
+
+=================
+
+see i told you it would only be a few hours :woomy:
+today, *while fighting OOP*, i got the cpu reading actual instructions for the first time!
+a big explanation, if you're interested:
+
+### the CU
+The CU, or Control Unit, is a... *guess...* Unit that Controls Things :droidshocked:
+For every tick of the processor, it looks at the Program Counter (PC) register, and reads the byte, or the opcode, in that memory address. It then runs the instruction associated with that 8-bit opcode number, which does whatever it needs to the memory and registers of the processor, using the ALU (Arithmetic Logic Unit) to perform mathematical operations.
+
+Some processors use a large amount of opcodes, but my processor uses more memory space to save on making multiple opcodes for similar functions. For example, if you wanted to `MOV` one value to another place, there are several ways you might want to do it: register to register, register to memory, memory to memory, et cetera. In a modern processor, those would all be represented as distinct opcodes. In my processor (and other older or simpler ones), you use a second byte to specify which form of that operation you're doing.
+
+That second byte is called an operand: an instruction can have multiple that all follow the initial instruction, modifying the behaviour. Following the previous example:
+```hex
+0x0000: 0x10 # MOV
+0x0001: 0x02 # Value to Register
+0x0002: 0x04 # Destination: Register R4
+0x0003: 0x3A # Source: high byte 
+0x0004: 0x33 # Source: low byte
+```
+this program puts the value 0x3A33 (ASCII for :3) in R4! it can keep performing instructions like this :) those are what I have to implement!
+
+### OOP hell, again
+The opcodes are defined centrally in `set.py`, specifically an IntEnum named `Op`. It's just a set of key-value pairs with classes inside, so-
+```python
+MOV = 0x10
+ADD = 0x11
+SUB = 0x12
+```
+and I can change and add this as I keep developing instructions. Each instruction is a class inherited from a base Instruction class, so `ADD(Instruction): etc`. The Instruction base class takes care of adding itself to an internal register of opcodes and their matching classes, and it holds references to one central MU, registers, and ALU. This way, instructions are simply a single function, `execute()`.
+
+That function is an Iterator function returning no values, allowing me to put it inside of a class:
+```python
+def tick(self):
+    if not self.iterable:
+        opcode = self.mu.read(self.registers.PC)
+        instruction = Instruction.registry.get(opcode)
+        instance = instruction(self.mu, self.alu, self.registers)
+        self.registers.PC += 0x0001
+        self.iterable = instance.execute()
+    
+    try:
+        next(self.iterable)
+    except StopIteration:
+        self.iterable = None
+```
+which will perform only one part of the instruction every clock cycle, or tick, mimicing how real processors work!!
+
+### Next
+I need to design the first few basic control flow instructions, then I'll probably devlog there. Math instructions come after that, which requires me to learn BINARY OPERATORS AND BOOLEAN MATH OH GOD OH GOD ODGSJHNfhm ,     ,

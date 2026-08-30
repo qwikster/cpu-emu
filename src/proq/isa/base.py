@@ -7,7 +7,6 @@ from proq.isa.set import Op
 
 if TYPE_CHECKING:
     from proq.hw.alu import ALU
-    from proq.hw.cu import CU
     from proq.hw.mu import MU
     from proq.hw.register import Registers
 

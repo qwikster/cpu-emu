@@ -36,14 +36,14 @@ class CU:
             opcode = self.mu.read(self.registers.PC)
             self.registers.IR = opcode
             instruction = Instruction.registry.get(opcode)
-            print('goog')
             if not instruction:
                 self.logger.cu(f"Invalid instruction {hex(opcode, 2)}")
                 interrupt.set(0x01) # invalid opcode
                 return
 
             instance = instruction(self.mu, self.alu, self.registers)
-            self.logger.cu(f"Running instruction {hex(opcode, 2)} ({instruction})")
+            self.registers.PC += 0x0001
+            self.logger.cu(f"Running instruction {hex(opcode, 2)} ({instruction.__name__})")
 
             self.iterable = instance.execute()
 
