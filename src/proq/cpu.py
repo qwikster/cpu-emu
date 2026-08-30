@@ -42,17 +42,18 @@ class CPU:
         self.mu.map_device(0xF000, 0xF000, StdoutOutput())
 
         # Registers
-        self.reg = Registers(self.log, stack_addr = romsize + memsize - 1, debug = flag_debug)
+        self.registers = Registers(self.log, stack_addr = romsize + memsize - 1, debug = flag_debug)
 
         # Instructions
         self.alu = ALU()
-        self.cu = CU(self.reg, self.mu)
+        self.cu = CU(self.alu, self.mu, self.registers, logger = logger)
 
     def tick(self):
-        self.cu.tick()
-        self.processor_cycle += 1
-        if self.reg[0] >= 0x0E:
-            self.log.interrupt("HALT")
-            input()
-        self.mu.write(0xF000, self.mu.read(self.reg[0]))
-        self.reg[0] += 1
+        pass
+        # self.cu.tick()
+        # self.processor_cycle += 1
+        # if self.registers[0] >= 0x0E:
+        #     self.log.interrupt("HALT")
+        #     input()
+        # self.mu.write(0xF000, self.mu.read(self.registers[0]))
+        # self.registers[0] += 1
